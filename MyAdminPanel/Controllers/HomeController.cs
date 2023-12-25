@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System;
 using System.Linq;
+using Microsoft.Extensions.Hosting;
 
 
 namespace MyAdminPanel.Controllers
@@ -14,8 +15,11 @@ namespace MyAdminPanel.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly AppDbContext _context;
-        public HomeController(AppDbContext context, ILogger<HomeController> logger)
+        private readonly IWebHostEnvironment _environment;
+
+        public HomeController(IWebHostEnvironment environment, AppDbContext context, ILogger<HomeController> logger)
         {
+            _environment = environment;
             _logger = logger;
             _context = context;
         }
@@ -151,6 +155,35 @@ namespace MyAdminPanel.Controllers
 
             return RedirectToAction("Index");
         }
+
+
+        [HttpPost]
+        public IActionResult ChangeFileName(int fileId, string newTitle)
+        {
+            try
+            {
+                var document = _context.Documents.Find(fileId);
+
+                if (document != null)
+                {
+                    string oldFilePath = document.FilePath;
+                    document.FilePath = document.FilePath.Replace(document.Title, newTitle);
+                    string newFilePath = document.FilePath;
+                    document.Title = newTitle;
+                    System.IO.File.Move(oldFilePath, newFilePath);
+                    _context.SaveChanges();
+
+                    return Redirect("Index");
+                }
+
+                return Json(new { success = false, errorMessage = "Document not found." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, errorMessage = ex.Message });
+            }
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
