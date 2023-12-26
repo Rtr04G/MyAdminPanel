@@ -27,7 +27,7 @@ namespace MyAdminPanel.Controllers
         }
 
         // GET: AdminUsers/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(string? id)
         {
             if (id == null || _context.AdminUsers == null)
             {
@@ -87,7 +87,7 @@ namespace MyAdminPanel.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,SurName,MiddleName,Phone,Email")] AdminUser adminUser)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,SurName,MiddleName,Phone,Email")] AdminUser adminUser)
         {
             if (id != adminUser.Id)
             {
@@ -118,7 +118,7 @@ namespace MyAdminPanel.Controllers
         }
 
         // GET: AdminUsers/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(string? id)
         {
             if (id == null || _context.AdminUsers == null)
             {
@@ -154,7 +154,7 @@ namespace MyAdminPanel.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AdminUserExists(int id)
+        private bool AdminUserExists(string id)
         {
           return (_context.AdminUsers?.Any(e => e.Id == id)).GetValueOrDefault();
         }

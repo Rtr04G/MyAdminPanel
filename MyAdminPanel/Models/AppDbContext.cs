@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MyAdminPanel.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-public class AppDbContext : IdentityDbContext
+public class AppDbContext : IdentityDbContext<AdminUser>
 {
     public DbSet<Document> Documents { get; set; }
     public DbSet<AdminUser> AdminUsers { get; set; }
@@ -11,4 +11,5 @@ public class AppDbContext : IdentityDbContext
     {
 
     }
+
 }

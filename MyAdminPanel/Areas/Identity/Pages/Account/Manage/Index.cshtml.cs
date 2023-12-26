@@ -9,17 +9,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MyAdminPanel.Models;
 
 namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
 {
     public class IndexModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<AdminUser> _userManager;
+        private readonly SignInManager<AdminUser> _signInManager;
 
         public IndexModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            UserManager<AdminUser> userManager,
+            SignInManager<AdminUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -58,24 +59,40 @@ namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+            [Display(Name = "Фамилия")]
+            public string SurName { get; set; }
+            [Display(Name = "Отчество")]
+            public string MiddleName { get; set; }
+            [Display(Name = "Специализация")]
+            public string Specialization { get; set; }
+            [Display(Name = "Категория")]
+            public string Category{ get; set; }
+            [Display(Name = "Адрес")]
+            public string Address { get; set; }
         }
 
-        private async Task LoadAsync(IdentityUser user)
+        private async Task LoadAsync(AdminUser user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
             Username = userName;
 
+
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                SurName = user.SurName,
+                MiddleName = user.MiddleName,
+                Specialization = user.Specialization,
+                Category = user.Category,
+                Address = user.Address
             };
         }
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
+            AdminUser user = (AdminUser)await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -87,7 +104,7 @@ namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
+            AdminUser user = (AdminUser)await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -109,6 +126,33 @@ namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
                     return RedirectToPage();
                 }
             }
+
+            if (Input.SurName!= user.SurName)
+            {
+                user.SurName = Input.SurName;
+            }
+
+            if (Input.MiddleName != user.MiddleName)
+            {
+                user.MiddleName = Input.MiddleName;
+            }
+
+            if (Input.Category != user.Category)
+            {
+                user.Category = Input.Category;
+            }
+
+            if (Input.Address != user.Address)
+            {
+                user.Address = Input.Address;
+            }
+
+            if (Input.Specialization != user.Specialization)
+            {
+                user.Specialization = Input.Specialization;
+            }
+
+            await _userManager.UpdateAsync(user);
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
