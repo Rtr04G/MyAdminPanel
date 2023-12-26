@@ -24,7 +24,7 @@ namespace MyAdminPanel.Controllers
             _context = context;
         }
 
-        public IActionResult Index(string sortOrder, string currentFilter, string searchString, DateTime? startDate, DateTime? endDate)
+        public IActionResult Index(string sortOrder, string searchString, DateTime? startDate, DateTime? endDate)
         {
             ViewData["CurrentSort"] = sortOrder;
             ViewData["TitleSortParam"] = string.IsNullOrEmpty(sortOrder) ? "title_desc" : "";
