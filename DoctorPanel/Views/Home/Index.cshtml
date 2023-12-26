@@ -1,8 +1,38 @@
-﻿@{
+﻿@model List<RecordIndexViewModel>
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (Model != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                   Пациент
+                </th>
+                <th>
+                    Время
+                </th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var record in Model)
+            {
+                <tr>
+                    <td>@record.SurName @record.MiddleName</td>
+                    <td>@record.Date.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>
+                        <a>Скачать</a> |
+                        <a>Удалить</a> |
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No documents available.</p>
+}
