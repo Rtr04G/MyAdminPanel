@@ -7,6 +7,8 @@ public class AppDbContext : IdentityDbContext<AdminUser>
 {
     public DbSet<AdminUser> AdminUsers { get; set; }
     public DbSet<Record> Records { get; set; }
+    public DbSet<PatientDocument> PatientDocuments { get; set; }
+    public DbSet<Document> Documents { get; set; }
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
 
