@@ -30,16 +30,18 @@
     {
         @foreach (var record in Model)
         {
+            <form asp-controller="Home" asp-action="Patient" method="get">
             <div class="card">
                 <div class="card-content">
                     <p>Пациент: @record.SurName @record.MiddleName</p>
                     <p>Время: @record.Date.ToString("yyyy-MM-dd HH:mm")</p>
                 </div>
+                <input type="hidden" name="Id" value="@record.Id">
                 <div class="card-actions">
-                    <a href="#">Скачать</a> |
-                    <a href="#">Удалить</a>
+                    <button type="submit">Подробно</button>
                 </div>
             </div>
+            </form>
         }
     }
     else

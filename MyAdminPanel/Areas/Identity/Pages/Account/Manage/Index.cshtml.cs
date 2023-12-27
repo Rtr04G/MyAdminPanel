@@ -61,6 +61,8 @@ namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
             public string PhoneNumber { get; set; }
             [Display(Name = "Фамилия")]
             public string SurName { get; set; }
+            [Display(Name = "Имя")]
+            public string Name { get; set; }
             [Display(Name = "Отчество")]
             public string MiddleName { get; set; }
             [Display(Name = "Специализация")]
@@ -83,6 +85,7 @@ namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
             {
                 PhoneNumber = phoneNumber,
                 SurName = user.SurName,
+                Name= user.Name,
                 MiddleName = user.MiddleName,
                 Specialization = user.Specialization,
                 Category = user.Category,
@@ -130,6 +133,11 @@ namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
             if (Input.SurName!= user.SurName)
             {
                 user.SurName = Input.SurName;
+            }
+
+            if (Input.Name != user.Name)
+            {
+                user.Name = Input.Name;
             }
 
             if (Input.MiddleName != user.MiddleName)

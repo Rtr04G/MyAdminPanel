@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System;
 using System.Linq;
 using Microsoft.Extensions.Hosting;
-
+using Microsoft.AspNetCore.Identity;
 
 namespace MyAdminPanel.Controllers
 {
@@ -16,12 +16,14 @@ namespace MyAdminPanel.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly AppDbContext _context;
         private readonly IWebHostEnvironment _environment;
+        private readonly UserManager<AdminUser> _userManager;
 
-        public HomeController(IWebHostEnvironment environment, AppDbContext context, ILogger<HomeController> logger)
+        public HomeController(UserManager<AdminUser> userManager, IWebHostEnvironment environment, AppDbContext context, ILogger<HomeController> logger)
         {
             _environment = environment;
             _logger = logger;
             _context = context;
+            _userManager = userManager;
         }
 
         public IActionResult Index(string sortOrder, string searchString, DateTime? startDate, DateTime? endDate)
@@ -72,7 +74,7 @@ namespace MyAdminPanel.Controllers
         }
 
         [HttpPost]
-        public IActionResult Add(FileUploadModel fileModel)
+        public async Task<IActionResult> AddAsync(FileUploadModel fileModel)
         {
             if (fileModel.File != null && fileModel.File.Length > 0)
             {
@@ -103,11 +105,11 @@ namespace MyAdminPanel.Controllers
                 }
                 else
                 {
-
+                    AdminUser user = await _userManager.GetUserAsync(HttpContext.User);
                     var newDocument = new Document
                     {
                         Title = Path.GetFileNameWithoutExtension(fileName),
-                        CreatedBy = "Пользователь",
+                        CreatedBy = user.Name + " " + user.MiddleName + " " + user.SurName,
                         CreationDate = DateTime.Now,
                         FilePath = filePath
                     };

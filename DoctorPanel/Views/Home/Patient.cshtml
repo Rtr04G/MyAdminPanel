@@ -1,0 +1,240 @@
+﻿@model (AdminUser, List<Document>, List<PatientDocument>)
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<button type="button" class="btn btn-link" onclick="openModalView()">Добавить документ</button>
+<div #table-container>
+    <div>
+        <p>ФИО: @Model.Item1.SurName  @Model.Item1.Name @Model.Item1.MiddleName</p>
+        <br>
+        <p>Адрес: Model.Address</p>
+    </div>
+    <input id="Id" type="hidden" name="Id" value="@Model.Item1.Id">
+</div>
+<div>
+<table class="table" id="sortable-table">
+    <thead>
+        <tr>
+            <th class="sortable" data-column="Title">
+                <div class="header-content">
+                    <a href="#" class="header-link">Название</a>
+                    <span class="sort-indicator"></span>
+                </div>
+            </th>
+            <th class="sortable" data-column="CreationDate">
+                <div class="header-content">
+                    <a href="#" class="header-link">Дата создания</a>
+                    <span class="sort-indicator"></span>
+                </div>
+            </th>
+            <th class="sortable" data-column="CreatedBy">
+                <div class="header-content">
+                    <a href="#" class="header-link">Автор</a>
+                    <span class="sort-indicator"></span>
+                </div>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var document in Model.Item3)
+        {
+        <tr>
+            <td>@document.Title</td>
+            <td>@document.CreationDate.ToString("yyyy-MM-dd")</td>
+            <td>@document.CreatedBy</td>
+            <td>
+                <a asp-action="Download" asp-route-id="@document.Id">Скачать</a> |
+                <a asp-action="Delete" asp-route-id="@document.Id" asp-route-PatId="@Model.Item1.Id">Удалить</a> |
+                <button type="button" class="btn btn-link" onclick="openChangeNameModal('@document.Id', '@document.Title')">Изменить название</button>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+</div>
+<div class="modal" id="ModalView" tabindex="-1" role="dialog" aria-labelledby="ModalViewLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalViewLabel">Добавить связанный документ</h5>
+            </div>
+            <form id="searchForm" asp-controller="Home" asp-action="Patient" method="get">
+                <input name="searchStr" type="text" />
+                <input type="hidden" name="Id" value="@Model.Item1.Id">
+                <input type="submit" hidden />
+            </form>
+            <div class="modal-body" style="overflow-y:auto;">
+                @{
+                    foreach (var document in Model.Item2)
+                {
+                    <form id="form-@document.Id" asp-controller="Home" asp-action="Patient" method="post">
+                        <input name="DocId" type="hidden" value="@document.Id">
+                        <input name="PatId" type="hidden" value="@Model.Item1.Id">
+                         <button class="myButton btn btn-link" data-docid="@document.Id">@document.Title</button>
+                        <input type="text" name="docName" class="myTextField" placeholder="Введите желаемое название" data-docid ="@document.Id">
+                        <input type="submit" hidden/>
+                    </form>
+                    <br />
+                }
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="changeNameModal" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changeNameModalLabel">Изменить название файла</h5>
+            </div>
+            <div class="modal-body">
+                <form id="changeNameForm" asp-controller="Home" asp-action="ChangePatientFileName" method="post">
+                    <label for="newTitle">Новое название:</label>
+                    <input type="text" id="newTitle" name="newTitle" class="form-control" />
+                    <input type="hidden" id="fileId" name="fileId" />
+                    <input type="hidden" id="PatId" name="PatId" value="@Model.Item1.Id" />
+                    <button type="submit" style="display: none;"></button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="submitForm()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <style>
+        .myButton {
+            display: inline-block;
+        }
+
+        .myTextField {
+            display: none;
+        }
+
+    .header-link {
+        text-decoration: none;
+        color: blue;
+    }
+
+    .sort-indicator {
+        margin-left: 5px;
+        font-size: 12px;
+    }
+
+    .asc .sort-indicator::after {
+        content: '\25B2'; /* Стрелка вверх */
+    }
+
+    .desc .sort-indicator::after {
+        content: '\25BC'; /* Стрелка вниз */
+    }
+
+    .header-link.clicked {
+        color: red;
+    }
+
+        #table-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Добавлено для центрирования по вертикали на всю высоту экрана */
+    }
+    </style>
+
+<script>
+    function openModalView() {
+        $('#ModalView').modal('show');
+    }
+
+    function hideModalView() {
+        $('#ModalView').modal('hide');
+    }
+
+    function openChangeNameModal(fileId, currentTitle) {
+        document.getElementById('fileId').value = fileId;
+        document.getElementById('newTitle').value = currentTitle;
+        $('#changeNameModal').modal('show');
+    }
+
+    function submitForm() {
+        document.getElementById('changeNameForm').submit();
+    }
+
+    $('#searchForm').submit(function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            data: $(this).serialize(),
+            success: function (data) {
+                $('#ModalView .modal-body').html(data);
+            }
+        });
+    });
+ $(document).ready(function () {
+            $('.myButton').click(function (event) {
+            event.preventDefault();
+
+            var docId = $(this).data('docid');
+
+            // Скрываем кнопку
+            $(this).hide();
+
+
+            $('.myTextField[data-docid="' + docId + '"]').show().focus();
+        });
+
+        $('.myTextField').blur(function () {
+            var docId = $(this).data('docid');
+
+            $('.myButton[data-docid="' + docId + '"]').show();
+
+
+            $(this).hide();
+        });
+
+        $('.myTextField').keydown(function (event) {
+            if (event.which === 13) { 
+                event.preventDefault();
+                
+                var form = $(this).closest('form');
+                
+                form.submit();
+            }
+        });
+
+         $('.header-link').click(function (event) {
+            event.preventDefault();
+            $('.header-link').removeClass('clicked');
+            $('.sortable').removeClass('asc desc');
+            var currentSortDirection = $(this).parent().hasClass('asc') ? 'desc' : 'asc';
+            $(this).parent().toggleClass(currentSortDirection);
+            $(this).addClass('clicked');
+        });
+
+        $('.sortable').click(function (event) {
+            // Проверяем, что клик произошел именно по тексту заголовка
+            if ($(event.target).is('.header-content, .header-link')) {
+                var table = $(this).parents('table').eq(0);
+                var rows = table.find('tbody > tr').toArray().sort(comparer($(this).index()));
+                this.asc = !this.asc;
+                if (!this.asc) { rows = rows.reverse(); }
+                for (var i = 0; i < rows.length; i++) { table.find('tbody').append(rows[i]); }
+            }
+        });
+
+        function comparer(index) {
+            return function (a, b) {
+                var valA = getCellValue(a, index), valB = getCellValue(b, index);
+                return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB);
+            };
+        }
+
+        function getCellValue(row, index) {
+            return $(row).children('td').eq(index).text();
+        }
+    });
+
+
+</script>

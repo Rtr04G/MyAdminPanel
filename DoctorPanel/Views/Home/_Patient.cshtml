@@ -1,0 +1,13 @@
+﻿@model (AdminUser, List<Document>)
+
+@foreach (var document in Model.Item2)
+{
+                        <form id="form-@document.Id" asp-controller="Home" asp-action="Patient" method="post">
+                            <input name="DocId" type="hidden" value="@document.Id">
+                            <input name="PatId" type="hidden" value="@Model.Item1.Id">
+                             <button class="myButton btn btn-link" data-docid="@document.Id">@document.Title</button>
+                            <input type="text" name="docName" class="myTextField" placeholder="Введите желаемое название" data-docid ="@document.Id">
+                            <input type="submit" hidden/>
+                        </form>
+                        <br />
+}

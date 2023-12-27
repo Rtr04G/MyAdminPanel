@@ -5,6 +5,7 @@ using System.Web.WebPages;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using System.Linq;
+using System.IO;
 
 namespace DoctorPanel.Controllers
 {
@@ -40,6 +41,7 @@ namespace DoctorPanel.Controllers
                 myrecord.MiddleName = usersDB.FirstOrDefault(u => u.Id == record.PatientId).MiddleName;
                 myrecord.Adderss = usersDB.FirstOrDefault(u => u.Id == record.PatientId).Address;
                 myrecord.Date = record.DateX;
+                myrecord.Id = record.PatientId;
                 recordsOfThisUser.Add(myrecord);
             };
 
@@ -72,6 +74,125 @@ namespace DoctorPanel.Controllers
 
             return View(recordsOfThisUser);
         }
+
+        [HttpGet]
+        public IActionResult Patient(string Id, string searchStr)
+        {
+            searchStr = searchStr ?? "";
+            ViewData["Search"] = searchStr;
+            AdminUser patient = _context.AdminUsers.AsQueryable().Where(r => r.Id == Id).FirstOrDefault();
+            List<Document> docs = _context.Documents.AsQueryable().Where(r => r.Title.Contains(searchStr)).ToList();
+            List<PatientDocument>Pdoc = _context.PatientDocuments.AsQueryable().Where(p => p.PatientId==Id).ToList();
+            var model = (patient, docs, Pdoc);
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_Patient", model);
+            }
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        public async Task<RedirectResult> Patient(int DocId, string PatId, string docName)
+        {
+            Document Doc = _context.Documents.AsQueryable().Where(r => r.Id == DocId).FirstOrDefault();
+            AdminUser patient = _context.AdminUsers.AsQueryable().Where(r => r.Id == PatId).FirstOrDefault();
+            string DPath = "C:\\FileCatalog\\Patients\\" + patient.SurName + " " + patient.Name + " " + patient.MiddleName + " " + PatId;
+            string FPath2 = DPath + "\\" + docName + ".docx";
+            if (Directory.Exists(DPath))
+            {
+                if(System.IO.File.Exists(FPath2))
+                {
+                    System.IO.File.Delete(FPath2);
+                }
+                System.IO.File.Copy(Doc.FilePath, FPath2,true);
+            }
+            else
+            {
+                Directory.CreateDirectory(DPath);
+                System.IO.File.Copy(Doc.FilePath, FPath2,true);
+            }
+            PatientDocument pDocument = _context.PatientDocuments.AsQueryable().Where(p=>p.Title == docName).FirstOrDefault();
+            if (pDocument != null)
+            {
+                _context.PatientDocuments.Remove(pDocument);
+            }
+            AdminUser user = await _userManager.GetUserAsync(HttpContext.User);
+            PatientDocument pDoc = new PatientDocument
+            {
+                Title = docName,
+                CreatedBy = user.Name +" "+user.MiddleName+" "+user.SurName,
+                CreationDate = DateTime.Now,
+                FilePath = FPath2,
+                PatientId = PatId
+            };
+            _context.PatientDocuments.Add(pDoc);
+            _context.SaveChanges();
+            return Redirect("Patient?Id="+PatId+"&seatchString=''");
+        }
+
+
+        [HttpPost]
+        public IActionResult ChangePatientFileName(int fileId, string newTitle, string PatId)
+        {
+
+            try
+            {
+                var document = _context.PatientDocuments.Find(fileId);
+
+                if (document != null)
+                {
+                    string oldFilePath = document.FilePath;
+                    document.FilePath = document.FilePath.Replace(document.Title, newTitle);
+                    string newFilePath = document.FilePath;
+                    document.Title = newTitle;
+                    System.IO.File.Move(oldFilePath, newFilePath);
+                    _context.SaveChanges();
+
+                    return Redirect("Patient?Id=" + PatId + "&seatchString=''");
+                }
+
+                return Json(new { success = false, errorMessage = "Document not found." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, errorMessage = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult Download(int id)
+        {
+            var document = _context.PatientDocuments.Find(id);
+
+            if (document == null)
+            {
+                return NotFound();
+            }
+
+            var fileStream = System.IO.File.OpenRead(document.FilePath);
+            return File(fileStream, "application/octet-stream", document.Title + ".docx");
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int id, string PatId)
+        {
+            var document = _context.PatientDocuments.Find(id);
+
+            if (document == null)
+            {
+                return NotFound();
+            }
+
+            System.IO.File.Delete(document.FilePath);
+            _context.PatientDocuments.Remove(document);
+            _context.SaveChanges();
+
+            return Redirect("/Home/Patient?Id=" + PatId);
+        }
+
 
         public IActionResult Privacy()
         {
