@@ -1,38 +1,112 @@
 ﻿@model List<RecordIndexViewModel>
 @{
     ViewData["Title"] = "Home Page";
+    ViewData["SortOrderName"] = "asc";
+    ViewData["SortOrderDate"] = "asc";
 }
 
-@if (Model != null)
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                   Пациент
-                </th>
-                <th>
-                    Время
-                </th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var record in Model)
-            {
-                <tr>
-                    <td>@record.SurName @record.MiddleName</td>
-                    <td>@record.Date.ToString("yyyy-MM-dd HH:mm")</td>
-                    <td>
-                        <a>Скачать</a> |
-                        <a>Удалить</a> |
-                    </td>
-                </tr>
+<form asp-controller="Home" asp-action="Index" method="get">
+    <label>Сортировка по имени:</label>
+        <select name="sortOrderName">
+            <option value="asc">По возрастанию</option>
+            <option value="desc">По убыванию</option>
+        </select>
+
+        <label>Сортировка по дате:</label>
+        <select name="sortOrderDate">
+            <option value="asc">Хронологически</option>
+            <option value="desc">Инверсия хронологии</option>
+        </select>
+
+        <label>Фильтр по дате:</label>
+        <input type="date" name="startDate" value="@ViewData["StartDate"]" />
+        <label>до</label>
+        <input type="date" name="endDate" value="@ViewData["EndDate"]" />
+        <button type="submit">Применить фильтры</button>
+</form>
+
+<div class="card-container">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var record in Model)
+        {
+            <div class="card">
+                <div class="card-content">
+                    <p>Пациент: @record.SurName @record.MiddleName</p>
+                    <p>Время: @record.Date.ToString("yyyy-MM-dd HH:mm")</p>
+                </div>
+                <div class="card-actions">
+                    <a href="#">Скачать</a> |
+                    <a href="#">Удалить</a>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p>No documents available.</p>
+    }
+</div>
+
+<style>
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .card {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        margin: 10px;
+        padding: 10px;
+        width: 200px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+        .card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+    .card-content {
+        margin-bottom: 10px;
+    }
+
+    .card-actions a {
+        text-decoration: none;
+        color: #007bff;
+        margin-right: 10px;
+    }
+
+    .filters {
+        margin-bottom: 20px;
+    }
+
+        /* Добавим стили для кнопки применения фильтров */
+        .filters button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+            .filters button:hover {
+                background-color: #0056b3;
             }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>No documents available.</p>
+</style>
+
+@section scripts {
+    <script>
+        function applyFilters() {
+            var sortOrderName = document.getElementById("sortOrder").value;
+            var startDate = document.getElementById("startDate").value;
+            var endDate = document.getElementById("endDate").value;
+
+            // Отправить запрос на сервер с параметрами sortOrder, startDate и endDate
+            // и обновить список карточек на основе полученных данных.
+            // Можно использовать AJAX или другие технологии для этого.
+        }
+    </script>
 }

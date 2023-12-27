@@ -30,7 +30,6 @@ namespace MyAdminPanel.Controllers
             ViewData["TitleSortParam"] = string.IsNullOrEmpty(sortOrder) ? "title_desc" : "";
             ViewData["DateSortParam"] = sortOrder == "date" ? "date_desc" : "date";
             ViewData["AuthorSortParam"] = sortOrder == "author" ? "author_desc" : "author";
-
             ViewData["CurrentFilter"] = searchString;
 
             IQueryable<Document> documents = _context.Documents.AsQueryable();
