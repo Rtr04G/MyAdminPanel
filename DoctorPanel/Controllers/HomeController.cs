@@ -6,9 +6,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.IO;
+using System.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DoctorPanel.Controllers
 {
+    [Authorize(Roles = "Doctor")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -191,6 +194,64 @@ namespace DoctorPanel.Controllers
             _context.SaveChanges();
 
             return Redirect("/Home/Patient?Id=" + PatId);
+        }
+
+        [HttpGet]
+        public IActionResult Add(string PatId)
+        {
+            ViewData["id"] = PatId;
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddAsync(FileUploadModel fileModel, string PatId)
+        {
+            ViewData["id"] = PatId;
+            if (fileModel.File != null && fileModel.File.Length > 0)
+            {
+                var patient = _context.AdminUsers.AsQueryable().FirstOrDefault(x => x.Id == PatId);
+
+                string fPath = "C:\\FileCatalog\\Patients\\" + patient.SurName + " " + patient.Name + " " + patient.MiddleName + " " + PatId;
+                var fileName = Path.GetFileName(fileModel.File.FileName);
+                var filePath = Path.Combine(fPath, fileName);
+
+
+                if (System.IO.File.Exists(filePath))
+                {
+
+                    System.IO.File.Delete(filePath);
+                }
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    fileModel.File.CopyTo(stream);
+                }
+
+                AdminUser user = await _userManager.GetUserAsync(HttpContext.User);
+                var newDocument = new PatientDocument
+                {
+                    Title = Path.GetFileNameWithoutExtension(fileName),
+                    CreatedBy = user.Name + " " + user.MiddleName + " " + user.SurName,
+                    CreationDate = DateTime.Now,
+                    FilePath = filePath,
+                    PatientId= patient.Id
+                };
+
+                var oldDocument = _context.PatientDocuments.AsQueryable().Where(d => d.Title == newDocument.Title).FirstOrDefault();
+                if (oldDocument != null)
+                {
+                    _context.PatientDocuments.Remove(oldDocument);
+                }
+
+                _context.PatientDocuments.Add(newDocument);
+
+                _context.SaveChanges();
+
+                return RedirectToAction("Add");
+            }
+
+            ModelState.AddModelError("File", "Пожалуйста, выберите файл.");
+            return View();
         }
 
 

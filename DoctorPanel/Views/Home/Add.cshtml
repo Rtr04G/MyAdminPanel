@@ -1,0 +1,11 @@
+﻿@model DoctorPanel.Models.FileUploadModel
+
+<form method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="file">Выберите файл:</label>
+        <input type="file" name="file" class="form-control" required asp-for="File">
+        <input type="hidden" name="PatId" value="@ViewData["id"]" />
+        <span asp-validation-for="File" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-success">Добавить</button>
+</form>
