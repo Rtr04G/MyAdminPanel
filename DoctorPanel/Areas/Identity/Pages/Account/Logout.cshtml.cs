@@ -30,7 +30,7 @@ namespace DoctorPanel.Areas.Identity.Pages.Account
             _logger.LogInformation("User logged out.");
             if (returnUrl != null)
             {
-                return LocalRedirect(returnUrl);
+                return Redirect("http://localhost:13944/");
             }
             else
             {

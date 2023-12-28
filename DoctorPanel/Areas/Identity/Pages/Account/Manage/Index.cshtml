@@ -26,21 +26,27 @@
                 <label asp-for="Input.MiddleName" class="form-label"></label>
                 <span asp-validation-for="Input.MiddleName" class="text-danger"></span>
             </div>
-            <div class="form-floating">
-                <input asp-for="Input.Specialization" class="form-control" />
-                <label asp-for="Input.Specialization" class="form-label"></label>
-                <span asp-validation-for="Input.Specialization" class="text-danger"></span>
-            </div>
-            <div class="form-floating">
-                <input asp-for="Input.Category" class="form-control" />
-                <label asp-for="Input.Category" class="form-label"></label>
-                <span asp-validation-for="Input.Category" class="text-danger"></span>
-            </div>
-            <div class="form-floating">
-                <input asp-for="Input.Address" class="form-control" />
-                <label asp-for="Input.Address" class="form-label"></label>
+            @if (ViewContext.HttpContext.User.IsInRole("Doctor"))
+            {
+                <div class="form-floating">
+                    <select asp-for="Input.Specialization" asp-items='ViewData["Specializations"] as SelectList' class="form-control">
+                        <option value="">Выберите специализацию</option>
+                    </select>
+                    <span asp-validation-for="Input.Specialization" class="text-danger"></span>
+                </div>
+                <div class="form-floating">
+                    <select asp-for="Input.Category" asp-items='ViewData["Categories"] as SelectList' class="form-control">
+                        <option value="">Выберите категорию</option>
+                    </select>
+                    <span asp-validation-for="Input.Category" class="text-danger"></span>
+                </div>
+                <div class="form-floating">
+                    <select asp-for="Input.Address" asp-items='ViewData["LPUs"] as SelectList' class="form-control">
+                    <option value="">Выберите ЛПУ</option>
+                </select>
                 <span asp-validation-for="Input.Address" class="text-danger"></span>
             </div>
+            }
             <div class="form-floating">
                 <input asp-for="Input.PhoneNumber" class="form-control" />
                 <label asp-for="Input.PhoneNumber" class="form-label"></label>

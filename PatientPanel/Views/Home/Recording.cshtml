@@ -1,0 +1,67 @@
+﻿@model (List<AdminUser>,List<Category>,List<Specialization>)
+<div class="card-container">
+    @foreach (var record in Model.Item1)
+    {
+                            <form aps-asp-controller="Home" asp-action="Recording" method="post">
+                            <div class="card">
+                                <div class="card-content">
+                                    <p>ФИО: @record.SurName @record.MiddleName</p>
+                                </div>
+                                <div class="card-actions">    
+                                    <input type="hidden" name="DocId" value="@record.Id"></input>
+                                    <input type="hidden" name="PatId" value="@ViewData["PatId"]"></input>
+                                    <button type="submit">Записаться!</button>
+                                </div>
+                            </div>
+                            </form>
+    }
+</div>
+
+<style>
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .card {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        margin: 10px;
+        padding: 10px;
+        width: 200px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+        .card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+    .card-content {
+        margin-bottom: 10px;
+    }
+
+    .card-actions a {
+        text-decoration: none;
+        color: #007bff;
+        margin-right: 10px;
+    }
+
+    .filters {
+        margin-bottom: 20px;
+    }
+
+        /* Добавим стили для кнопки применения фильтров */
+        .filters button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+            .filters button:hover {
+                background-color: #0056b3;
+            }
+</style>

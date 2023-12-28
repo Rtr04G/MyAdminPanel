@@ -10,6 +10,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoctorPanel", "DoctorPanel\
 		{756461B0-0D74-4D61-A0AC-5074422565B2} = {756461B0-0D74-4D61-A0AC-5074422565B2}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatientPanel", "PatientPanel\PatientPanel.csproj", "{554DB94D-7FD6-457E-BEF8-76935F5954D4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2FD60DBD-D9BC-41E9-85E9-6E2DC39F1043} = {2FD60DBD-D9BC-41E9-85E9-6E2DC39F1043}
+		{756461B0-0D74-4D61-A0AC-5074422565B2} = {756461B0-0D74-4D61-A0AC-5074422565B2}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +30,10 @@ Global
 		{2FD60DBD-D9BC-41E9-85E9-6E2DC39F1043}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FD60DBD-D9BC-41E9-85E9-6E2DC39F1043}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FD60DBD-D9BC-41E9-85E9-6E2DC39F1043}.Release|Any CPU.Build.0 = Release|Any CPU
+		{554DB94D-7FD6-457E-BEF8-76935F5954D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{554DB94D-7FD6-457E-BEF8-76935F5954D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{554DB94D-7FD6-457E-BEF8-76935F5954D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{554DB94D-7FD6-457E-BEF8-76935F5954D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

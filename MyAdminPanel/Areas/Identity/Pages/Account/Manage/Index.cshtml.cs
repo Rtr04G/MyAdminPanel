@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using MyAdminPanel.Models;
 
 namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
@@ -17,13 +18,16 @@ namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<AdminUser> _userManager;
         private readonly SignInManager<AdminUser> _signInManager;
+        private readonly AppDbContext _context;
 
         public IndexModel(
             UserManager<AdminUser> userManager,
-            SignInManager<AdminUser> signInManager)
+            SignInManager<AdminUser> signInManager,
+            AppDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
         }
 
         /// <summary>
@@ -61,8 +65,6 @@ namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
             public string PhoneNumber { get; set; }
             [Display(Name = "Фамилия")]
             public string SurName { get; set; }
-            [Display(Name = "Имя")]
-            public string Name { get; set; }
             [Display(Name = "Отчество")]
             public string MiddleName { get; set; }
             [Display(Name = "Специализация")]
@@ -77,7 +79,7 @@ namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
+            
             Username = userName;
 
 
@@ -85,7 +87,6 @@ namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
             {
                 PhoneNumber = phoneNumber,
                 SurName = user.SurName,
-                Name= user.Name,
                 MiddleName = user.MiddleName,
                 Specialization = user.Specialization,
                 Category = user.Category,
@@ -95,6 +96,12 @@ namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnGetAsync()
         {
+            List<Category> categories = _context.Categories.ToList();
+            List<Specialization> specializations = _context.Specializations.ToList();
+            List<LPU> LPUs = _context.LPUs.ToList();
+            ViewData["Categories"] = new SelectList(categories, "Id", "Name"); 
+            ViewData["Specializations"] = new SelectList(specializations, "Id", "Name");
+            ViewData["LPUs"] = new SelectList(LPUs, "Id", "Name");
             AdminUser user = (AdminUser)await _userManager.GetUserAsync(User);
             if (user == null)
             {
@@ -107,6 +114,12 @@ namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
+            List<Category> categories = _context.Categories.ToList();
+            List<Specialization> specializations = _context.Specializations.ToList();
+            List<LPU> LPUs= _context.LPUs.ToList();
+            ViewData["Categories"] = new SelectList(categories, "Id", "Name");
+            ViewData["Specializations"] = new SelectList(specializations, "Id", "Name");
+            ViewData["LPUs"] = new SelectList(LPUs, "Id", "Name");
             AdminUser user = (AdminUser)await _userManager.GetUserAsync(User);
             if (user == null)
             {
@@ -133,11 +146,6 @@ namespace MyAdminPanel.Areas.Identity.Pages.Account.Manage
             if (Input.SurName!= user.SurName)
             {
                 user.SurName = Input.SurName;
-            }
-
-            if (Input.Name != user.Name)
-            {
-                user.Name = Input.Name;
             }
 
             if (Input.MiddleName != user.MiddleName)

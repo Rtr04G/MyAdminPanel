@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using DoctorPanel.Models;
 
 namespace DoctorPanel.Areas.Identity.Pages.Account.Manage
@@ -17,13 +18,16 @@ namespace DoctorPanel.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<AdminUser> _userManager;
         private readonly SignInManager<AdminUser> _signInManager;
+        private readonly AppDbContext _context;
 
         public IndexModel(
             UserManager<AdminUser> userManager,
-            SignInManager<AdminUser> signInManager)
+            SignInManager<AdminUser> signInManager,
+            AppDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
         }
 
         /// <summary>
@@ -75,7 +79,7 @@ namespace DoctorPanel.Areas.Identity.Pages.Account.Manage
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
+            
             Username = userName;
 
 
@@ -92,6 +96,12 @@ namespace DoctorPanel.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnGetAsync()
         {
+            List<Category> categories = _context.Categories.ToList();
+            List<Specialization> specializations = _context.Specializations.ToList();
+            List<LPU> LPUs = _context.LPUs.ToList();
+            ViewData["Categories"] = new SelectList(categories, "Id", "Name"); 
+            ViewData["Specializations"] = new SelectList(specializations, "Id", "Name");
+            ViewData["LPUs"] = new SelectList(LPUs, "Id", "Name");
             AdminUser user = (AdminUser)await _userManager.GetUserAsync(User);
             if (user == null)
             {
@@ -104,6 +114,12 @@ namespace DoctorPanel.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
+            List<Category> categories = _context.Categories.ToList();
+            List<Specialization> specializations = _context.Specializations.ToList();
+            List<LPU> LPUs= _context.LPUs.ToList();
+            ViewData["Categories"] = new SelectList(categories, "Id", "Name");
+            ViewData["Specializations"] = new SelectList(specializations, "Id", "Name");
+            ViewData["LPUs"] = new SelectList(LPUs, "Id", "Name");
             AdminUser user = (AdminUser)await _userManager.GetUserAsync(User);
             if (user == null)
             {
