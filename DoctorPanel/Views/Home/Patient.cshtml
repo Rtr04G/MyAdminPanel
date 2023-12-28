@@ -1,6 +1,12 @@
 ﻿@model (AdminUser, List<Document>, List<PatientDocument>)
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<button type="button" class="btn btn-link" onclick="openModalView()">Добавить документ</button>
+<button type="button" class="btn btn-success onclick="openModalView()">Добавить шаблонный документ</button>
+<br />
+<br />
+<form asp-controller="Home" asp-action="Add">
+    <input name="PatId" type="hidden" value="@Model.Item1.Id" />
+    <button type="submit" class="btn btn-success">Обновить или добавить документ</button>
+</form>
 <div #table-container>
     <div>
         <p>ФИО: @Model.Item1.SurName  @Model.Item1.Name @Model.Item1.MiddleName</p>
